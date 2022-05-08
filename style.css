@@ -3,9 +3,9 @@ body {
 }
 canvas {
     display: block;
-    /*margin-top: 80px;*/
+    margin-top: 80px;
     margin-left: auto;
     margin-right: auto;
-    border: 3px solid #ddd;
-    filter: drop-shadow(0 0 2spx #111111);
+    border: 10px solid #464646;
+    filter: drop-shadow(0 0 2px #111111);
 }
