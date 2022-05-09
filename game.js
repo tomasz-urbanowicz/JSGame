@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
 
-    canvas.width = 1200; /*todo: zmienić właściwości width oraz heigh, dostosować mapę*/
+    canvas.width = 1200;
     canvas.height = 900;
 
     context.fillStyle = "#f1f2f1";
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
         [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, -1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1],
@@ -42,10 +42,10 @@ document.addEventListener('DOMContentLoaded', function (event) {
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     ];
 
-    level = new Level(30, 30, canvas.width, canvas.height, map); /*todo: dostosować wallWidth i wallHeight tak jak wyżej*/
-    level.checkWallsSize();
+    level = new Level(30, 30, canvas.width, canvas.height, map);
 
     level.drawMap(context);
+    level.checkWallsSize();
 
     if (!level.checkMap(map)) {
         alert("Verifying the correctness of the map: " + level.checkMap(map));
@@ -335,14 +335,27 @@ class Player {
 }
 
 class Level {
-
     /**
-     * Fields
-     * */
+     * Wall size. Include width and height of the wall in pixels.
+     */
     #wall;
+    /**
+     * Size as number of walls horizontally. This value is calculated base on canvas' size and size of wall element
+     */
     #width;
+    /**
+     *Size as number of walls horizontally. This value is calculated base on canvas' size and size of wall element
+     */
     #height;
+    /**
+     * Type of walls available at a given level
+     * The walls variable stores an array of objects. Each object has an id with the name of the wall, a color and a field named
+     * solid indicating whether the user can pass through wall.
+     */
     #walls;
+    /**
+     * current level map definition.
+     */
     #map;
     #gravity;
 
@@ -352,24 +365,26 @@ class Level {
      * @param wallHeight wall size: set up to the parameter wall
      * @param canvasWidth canvas dimension uses to calculate parameter width
      * @param canvasHeight canvas dimension uses to calculate parameter height
-     * @param map variable map contains two-dimensional array of size height x width. Stores walls' type as indexes wall's array
+     * @param map variable map contains two-dimensional array of size height x width. Store walls' type as indexes wall's array
      */
     constructor(wallWidth, wallHeight, canvasWidth, canvasHeight, map) {
 
         this.#wall = {
-            width: wallWidth,
-            height: wallHeight
+            width: wallWidth, height: wallHeight
         };
+
         this.#width = canvasWidth / wallWidth;
+
         this.#height = canvasHeight / wallHeight;
+
         this.#walls = [
             {id: 'background', color: '#f1f2f1', solid: 0},
             {id: 'wall', color: '#262626', solid: 1},
             {id: 'win', color: '#00bb00', solid: 0},
             {id: 'lose', color: '#dd0000', solid: 0}
         ];
+
         this.#map = map;
-        // checkMap(map)
     };
 
     set wall(size) {
@@ -389,20 +404,12 @@ class Level {
         return this.#wall;
     }
 
-    set width(width) {
-        this.#width = width;
-    }
-
     get width() {
         return this.#width;
     }
 
     get height() {
         return this.#height;
-    }
-
-    set height(height) {
-        this.#height = height;
     }
 
     get gravity() {
@@ -421,18 +428,9 @@ class Level {
         return this.#map;
     }
 
-    drawWall(x1, y1, x2, y2, color, context) {
-        context.fillStyle = color;
-        context.fillRect(x1, y1, x2, y2);
-    }
-
-    /**
-     *
-     * @param context
-     */
     drawMap(context) {
-        for (let x = 0; x < level.#width; x++) {
-            for (let y = 0; y < level.#height; y++) {
+        for (var x = 0; x < level.#width; x++) {
+            for (var y = 0; y < level.#height; y++) {
                 this.drawWall(
                     x * this.#wall.width,
                     y * this.#wall.height,
@@ -441,33 +439,38 @@ class Level {
                     this.#walls[this.#map[y][x]].color,
                     context
                 );
+                if (!this.checkMap(this.map)) {
+                    alert("Wrong map parameters. Please check again.")
+                }
             }
         }
     };
 
+    drawWall(x1, y1, x2, y2, color, context) {
+        context.fillStyle = color;
+        context.fillRect(x1, y1, x2, y2);
+    }
+
     checkMap(map) {
         let minWidth = map[0].length;
         let minHeight = map.length;
+        let isValid = true;
         for (let y = 1; y < this.#height; y++) {
             if (map[y].length < minWidth) {
                 minWidth = map[y].length;
             }
         }
 
-        if (minWidth == this.#width && minHeight == this.#height) {
-            return true;
-        } else {
-            return false;
-        }
-
         for (let i = 0; i < map.length; i++) {
             const item = map[i];
             for (let j = 0; j < item.length; j++) {
-                if ((map[i][j] < 0) && (map[i][j] > 4)) {
-                    return false;
+                if ((map[i][j] < 0) || (map[i][j] > 4)) {
+                    isValid = false;
                 }
             }
         }
+
+        return minWidth === this.#width && minHeight === this.#height && isValid === true;
     }
 
     checkWallsSize() {
